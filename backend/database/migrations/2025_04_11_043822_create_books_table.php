@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('books', function (Blueprint $table) {
             $table->id();
             $table->string('title'); // Título del libro
+            $table->string('slug', 255)->unique(); // Slug único para el libro
             $table->string('author'); // Autor del libro
             $table->integer('year'); // Año de publicación
             $table->longText('content');
+            $table->integer('pages'); // Número de páginas
             $table->text('synopsis'); // Sinopsis del libro
             $table->string('cover_image'); //portada del libro    
             $table->timestamps();

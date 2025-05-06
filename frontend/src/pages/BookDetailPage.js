@@ -3,27 +3,65 @@
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { Row, Col, Button, Image, Badge, Tabs, Tab } from "react-bootstrap"
-import { booksData } from "../data/books"
+import axios from "axios"
+const API_URL = "http://localhost/api/books";
 
 function BookDetailPage() {
-  const [book, setBook] = useState(null)
-  const [activeTab, setActiveTab] = useState("description")
-  const { id } = useParams()
+  const [book, setBook] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("sinopsis");
+  const { slug } = useParams();
+  const [sentences, setSentences] = useState([]);
 
   useEffect(() => {
-    // Find the book by ID
-    const foundBook = booksData.find((book) => book.id === Number.parseInt(id))
-    setBook(foundBook)
-  }, [id])
+    const fetchBook = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/${slug}`);
+        setBook(response.data);
+        setError(null);
+      } catch (err) {
+        setError("Error al cargar el libro. Intenta nuevamente más tarde.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBook();
+  }, [slug]);
+
+  useEffect(() => {
+    const fetchSentences = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/${slug}/sentences`);
+        setSentences(response.data.sentences);
+      } catch (err) {
+        setError("Error al cargar oraciones. Intenta nuevamente más tarde.");
+        console.error(err);
+      }
+    };
+    fetchSentences();
+  }, []);
+  
+
+ 
+
+  if (loading) {
+    return <div className="text-center py-5">Cargando...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-5">{error}</div>;
+  }
 
   if (!book) {
-    return <div className="text-center py-5">Loading...</div>
+    return <div className="text-center py-5">Libro no encontrado.</div>;
   }
 
   return (
     <div>
       <Button variant="outline-primary" as={Link} to="/" className="mb-4">
-        &larr; Back to Books
+        ← Volver a Libros
       </Button>
 
       <Row>
@@ -39,73 +77,48 @@ function BookDetailPage() {
 
         <Col md={8}>
           <h1>{book.title}</h1>
-          <h4 className="text-muted">by {book.author}</h4>
+          <h4 className="text-muted">{book.author}</h4>
 
           <div className="my-3">
-            <Badge bg="primary" className="me-2">
-              {book.genre}
+          {book.genres.map((genre) => (
+            <Badge key={genre.id} bg="primary" className="me-2">
+              {genre.name}
             </Badge>
+          ))}
             <Badge bg="secondary" className="me-2">
               {book.year}
             </Badge>
-            <Badge bg="info">{book.pages} pages</Badge>
+            <Badge bg="info">{book.pages} páginas</Badge>
           </div>
 
           <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-3">
-            <Tab eventKey="description" title="Description">
-              <p className="lead">{book.description}</p>
+            <Tab eventKey="sinopsis" title="Sinopsis">
+              <p className="lead">{book.synopsis}</p>
             </Tab>
-            <Tab eventKey="details" title="Details">
-              <ul className="list-unstyled">
-                <li>
-                  <strong>Publisher:</strong> {book.publisher}
-                </li>
-                <li>
-                  <strong>Published:</strong> {book.year}
-                </li>
-                <li>
-                  <strong>Language:</strong> {book.language}
-                </li>
-                <li>
-                  <strong>ISBN:</strong> {book.isbn}
-                </li>
-                <li>
-                  <strong>Pages:</strong> {book.pages}
-                </li>
-              </ul>
-            </Tab>
-            <Tab eventKey="reader" title="Reader">
-              <div className="p-4 border rounded bg-light">
-                <p className="lead text-center mb-4">Book Preview</p>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                  dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                  aliquip ex ea commodo consequat.
-                </p>
-                <p>
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                  Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                  laborum.
-                </p>
-                <div className="text-center mt-4">
-                  <Button variant="primary">Continue Reading</Button>
-                </div>
-              </div>
-            </Tab>
-          </Tabs>
 
+            <Tab eventKey="texto" title="texto">
+              {console.log(sentences)}
+              {sentences.map((sentence, index) => (
+                <p key={index} className="lead">
+                   {sentence}
+                </p>
+              ))}
+              
+            </Tab>
+
+          </Tabs>
           <div className="d-grid gap-2 d-md-flex mt-4">
-            <Button variant="success" size="lg">
-              Read Now
+            <Button variant="success" size="lg" as={Link} to={`/books/${slug}/read`}>
+              Leer Ahora
             </Button>
             <Button variant="outline-secondary" size="lg">
-              Add to Library
+              Añadir a la Biblioteca
             </Button>
           </div>
         </Col>
       </Row>
     </div>
-  )
+  );
 }
 
 export default BookDetailPage

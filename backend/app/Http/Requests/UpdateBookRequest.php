@@ -26,9 +26,11 @@ class UpdateBookRequest extends FormRequest
             'author' => 'sometimes|required|string|max:255',
             'year' => 'sometimes|required|integer|min:1000|max:' . date('Y'),
             'content' => 'sometimes|required|string',
+            'pages' => 'sometimes|required|integer|min:1',
             'synopsis' => 'sometimes|required|string|max:1000',
             'cover_image' => 'sometimes|required|string|url',
-            'genres' => 'array|exists:genres,id', // Ensure genres exist in the database
+            'genres' => 'sometimes|array|exists:genres,id',
+            'genres.*' => 'integer|exists:genres,id',
         ];
     }
 }

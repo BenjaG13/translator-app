@@ -8,7 +8,7 @@ function BookCard({ book }) {
     <Card
       className="h-100 shadow-sm book-card"
       as={Link}
-      to={`/book/${book.id}`}
+      to={`/book/${book.slug}`}
       style={{
         cursor: "pointer",
         transition: "transform 0.2s",
@@ -38,6 +38,7 @@ function BookCard({ book }) {
         </div>
       </Card.Body>
     </Card>
+
   )
 }
 

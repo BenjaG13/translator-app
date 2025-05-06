@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BookController;
 
 
 
@@ -11,11 +12,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+Route::apiResource('books', BookController::class)->parameters([
+    'books' => 'slug',
+]);
 
-Route::get('/test', function () {
-    return response()->json(['message' => 'API funcionando']);
-});
-
-Route::get('/testing', function () {
-    return 'Prueba de API';
-});
+Route::get('/books/{slug}/sentences', [BookController::class, 'getSentences']);

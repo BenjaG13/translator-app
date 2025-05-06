@@ -26,9 +26,11 @@ class StoreBookRequest extends FormRequest
             'author' => 'required|string|max:255',
             'year' => 'required|integer|min:1000|max:' . date('Y'),
             'content' => 'required|string',
+            'pages' => 'required|integer|min:1',
             'synopsis' => 'required|string|max:1000',
             'cover_image' => 'required|string|url',
-            'genres' => 'array|exists:genres,id', // Ensure genres exist in the database
+            'genres' => 'sometimes|array|exists:genres,id',
+            'genres.*' => 'integer|exists:genres,id',
         ];
     }
 }

@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import Header from "./components/Header"
 import HomePage from "./pages/HomePage"
 import BookDetailPage from "./pages/BookDetailPage"
+import BookReaderPage from "./pages/BookReaderPage"
 import Footer from "./components/Footer"
 
 function App() {
@@ -15,7 +16,8 @@ function App() {
           <div className="container">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/book/:id" element={<BookDetailPage />} />
+              <Route path="/book/:slug" element={<BookDetailPage />} />
+              <Route path="/books/:slug/read" element={<BookReaderPage />} />
             </Routes>
           </div>
         </main>
