@@ -94,9 +94,9 @@ class BookController extends Controller
             $book = Book::where('slug', $slug)->firstOrFail();
 
             // Validar longitud del texto para evitar problemas
-            if (strlen($book->content) > 10000) {
-                return response()->json(['error' => 'El texto es demasiado largo'], 400);
-            }
+            // if (strlen($book->content) > 10000) {
+            //     return response()->json(['error' => 'El texto es demasiado largo'], 400);
+            // }
 
             // Escapar el texto para evitar inyecciones
             $escapedText = escapeshellarg($book->content);

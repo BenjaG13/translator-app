@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('book_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('progress')->default(0); // Campo para el progreso (ej. página actual)
+            $table->integer('progress')->default(1); // Campo para el progreso (ej. página actual)
             $table->timestamps();
         });
     }
