@@ -55,5 +55,12 @@ services:
       - frontend
       - laravel
 
+
+  libretranslate:
+    image: libretranslate/libretranslate
+    ports:
+      - "5000:5000"
+    command: --load-only=en,es
+
 volumes:
   dbdata:

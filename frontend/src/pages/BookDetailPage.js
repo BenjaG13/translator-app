@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { Row, Col, Button, Image, Badge, Tabs, Tab } from "react-bootstrap"
 import axios from "axios"
-const API_URL = "http://localhost/api/books";
+const API_URL = process.env.REACT_APP_API_URL+"/books";
 
 function BookDetailPage() {
   const [book, setBook] = useState(null);
@@ -61,7 +61,7 @@ function BookDetailPage() {
   return (
     <div>
       <Button variant="outline-primary" as={Link} to="/" className="mb-4">
-        ← Volver a Libros
+        ← Volver a Lios {localStorage.getItem('name')+"n"}
       </Button>
 
       <Row>
@@ -96,15 +96,7 @@ function BookDetailPage() {
               <p className="lead">{book.synopsis}</p>
             </Tab>
 
-            <Tab eventKey="texto" title="texto">
-              {console.log(sentences)}
-              {sentences.map((sentence, index) => (
-                <p key={index} className="lead">
-                   {sentence}
-                </p>
-              ))}
-              
-            </Tab>
+           
 
           </Tabs>
           <div className="d-grid gap-2 d-md-flex mt-4">

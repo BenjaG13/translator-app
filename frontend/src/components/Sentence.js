@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import axios from "axios";
 
-const TRANSLATE_API_URL = "http://localhost/api/translate"; // Ajusta según tu API
+const TRANSLATE_API_URL = process.env.REACT_APP_TRANSLATE_API_URL;
 
-function Sentence({ text }) {
+function Sentence({ text, source = "en", target = "es" }) {
   const [translatedText, setTranslatedText] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
@@ -13,7 +13,11 @@ function Sentence({ text }) {
   const handleTranslate = async () => {
     setIsTranslating(true);
     try {
-      const response = await axios.post(TRANSLATE_API_URL, { text });
+      const response = await axios.post(TRANSLATE_API_URL, {
+        text,
+        source,
+        target,
+      });
       setTranslatedText(response.data.translation || "Traducción no disponible");
       setShowTranslation(true);
     } catch (err) {
@@ -26,13 +30,13 @@ function Sentence({ text }) {
   };
 
   return (
-    <div className="mb-4 p-4 border rounded bg-light">
+    <div className="mb-4 p-4 border rounded bg-dark text-white">
       <p className="lead mb-2">{text}</p>
       {showTranslation && (
-        <p className="mt-2 text-muted fst-italic">{translatedText}</p>
+        <p className="mt-2 text-white fst-italic">{translatedText}</p>
       )}
       <Button
-        variant="outline-primary"
+        variant="outline-light"
         onClick={handleTranslate}
         disabled={isTranslating}
         size="sm"

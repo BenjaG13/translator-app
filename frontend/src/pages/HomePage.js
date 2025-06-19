@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
 import { Row, Col, Alert } from "react-bootstrap"
 import BookCard from "../components/BookCard"
 import axios from "axios"
+import { AppContext } from '../context/appContext';
 
-const API_URL = "http://localhost/api/books" // Reemplaza con la URL real de tu API
+const API_URL = process.env.REACT_APP_API_URL;
 
 function HomePage() {
   const [books, setBooks] = useState([])
@@ -29,13 +30,14 @@ function HomePage() {
     if (params.searchTerm) queryParams.append("search", params.searchTerm)
     if (params.genre) queryParams.append("genre", params.genre)
     if (params.shelf) queryParams.append("shelf", params.shelf)
-    return `${API_URL}?${queryParams.toString()}`
+    return `${API_URL+"/books"}?${queryParams.toString()}`
   }
 
   useEffect(() => {
     const fetchBooks = async () => {
       const searchParams = getSearchParams()
       const url = buildApiUrl(searchParams)
+
       try {
         const response = await axios.get(url)
         setBooks(response.data)

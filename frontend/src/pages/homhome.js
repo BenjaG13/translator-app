@@ -1,63 +1,113 @@
-"use client"
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { Pagination, Container, Button } from "react-bootstrap";
+import Sentence from "../components/Sentence";
+import { Link } from "react-router-dom";
 
-import { useState, useEffect } from "react"
-import { useLocation } from "react-router-dom"
-import { Row, Col, Alert } from "react-bootstrap"
-import BookCard from "../components/BookCard"
-import { booksData } from "../data/books"
+const API_URL = "http://localhost/api/books";
+const SENTENCES_PER_PAGE = 10;
 
-function HomePage() {
-  const [books, setBooks] = useState(booksData)
-  const location = useLocation()
+function BookReaderPage() {
+  const { slug } = useParams();
+  const [sentences, setSentences] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  // Cargar las oraciones del libro desde la API
   useEffect(() => {
-    // Get search params
-    const searchParams = new URLSearchParams(location.search)
-    const searchTerm = searchParams.get("search")
-    const genre = searchParams.get("genre")
-    const shelf = searchParams.get("shelf")
+    const fetchSentences = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/${slug}/sentences`);
+        setSentences(response.data.sentences || []);
+        setError(null);
+      } catch (err) {
+        setError("Error al cargar las oraciones del libro.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSentences();
+  }, [slug]);
 
-    // Filter books based on URL parameters
-    let filtered = booksData
+  // Calcular las oraciones a mostrar en la página actual
+  const totalPages = Math.ceil(sentences.length / SENTENCES_PER_PAGE);
+  const startIndex = (currentPage - 1) * SENTENCES_PER_PAGE;
+  const endIndex = startIndex + SENTENCES_PER_PAGE;
+  const currentSentences = sentences.slice(startIndex, endIndex);
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (book) =>
-          book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-    }
+  // Manejar el cambio de página
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0); // Volver al inicio de la página
+  };
 
-    if (genre && genre !== "All") {
-      filtered = filtered.filter((book) => book.genre === genre)
-    }
-
-    // For demonstration purposes only - in a real app, you'd have user data
-    if (shelf === "mylibrary") {
-      // Simulate "My Library" by showing only first 3 books
-      filtered = filtered.slice(0, 3)
-    }
-
-    setBooks(filtered)
-  }, [location.search])
+  // Estados de carga y error
+  if (loading) return <div className="text-center py-5">Cargando...</div>;
+  if (error) return <div className="text-center py-5 text-danger">{error}</div>;
 
   return (
-    <div>
-      <h2 className="mb-4">{location.search.includes("shelf=mylibrary") ? "My Library" : "Discover Books"}</h2>
+    <Container className="py-5">
+      <Button variant="outline-primary" as={Link} to={`/books/${slug}`} className="mb-4">
+        ← Volver al Detalle del Libro
+      </Button>
 
-      {books.length === 0 ? (
-        <Alert variant="info">No books found matching your criteria. Try adjusting your search or filters.</Alert>
-      ) : (
-        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {books.map((book) => (
-            <Col key={book.id}>
-              <BookCard book={book} />
-            </Col>
+      {totalPages > 1 && (
+        <Pagination className="mt-4 justify-content-center">
+          <Pagination.Prev
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          />
+          {[...Array(totalPages).keys()].map((page) => (
+            <Pagination.Item
+              key={page + 1}
+              active={page + 1 === currentPage}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              {page + 1}
+            </Pagination.Item>
           ))}
-        </Row>
+          <Pagination.Next
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          />
+        </Pagination>
+      )}  
+
+
+      <h2 className="text-2xl font-bold mb-4">Leyendo: {slug}</h2>
+
+      {/* Mostrar las oraciones de la página actual */}
+      {currentSentences.map((sentence, index) => (
+        <Sentence key={index} text={sentence} />
+      ))}
+
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <Pagination className="mt-4 justify-content-center">
+          <Pagination.Prev
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          />
+          {[...Array(totalPages).keys()].map((page) => (
+            <Pagination.Item
+              key={page + 1}
+              active={page + 1 === currentPage}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              {page + 1}
+            </Pagination.Item>
+          ))}
+          <Pagination.Next
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          />
+        </Pagination>
       )}
-    </div>
-  )
+    </Container>
+  );
 }
 
-export default HomePage
+export default BookReaderPage;
