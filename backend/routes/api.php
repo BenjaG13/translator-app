@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BookUserController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\TranslationController;
 
 
@@ -16,7 +17,8 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/books/{slug}/progress', [BookUserController::class, 'getProgress']);
     Route::post('/books/{slug}/progress', [BookUserController::class, 'updateProgress']);
-    
+    Route::get('/mybooks', [BookUserController::class, 'myBooks']); // <-- NUEVA RUTA
+
     Route::post('logout', [UserController::class, 'logout']);
 });
 
@@ -24,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::apiResource('books', BookController::class)->parameters([
     'books' => 'slug',
 ]);
+
+Route::get('genres', [GenreController::class, 'index']);
 
 Route::get('/books/{slug}/sentences', [BookController::class, 'getSentences']);
 

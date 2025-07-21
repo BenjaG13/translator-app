@@ -6,7 +6,7 @@ function Footer() {
     <footer className="bg-dark text-light py-4 mt-auto">
       <Container>
         <Row>
-          <Col md={4} className="mb-3 mb-md-0">
+          {/* <Col md={4} className="mb-3 mb-md-0">
             <h5>BookReader</h5>
             <p className="text-muted">Your digital reading companion</p>
           </Col>
@@ -34,19 +34,19 @@ function Footer() {
                 </Link>
               </li>
             </ul>
-          </Col>
+          </Col> */}
           <Col md={4}>
             <h5>Contact</h5>
             <ul className="list-unstyled">
-              <li className="text-light">Email: contact@bookreader.com</li>
+              <li className="text-light">contact@bookreader.com</li>
               <li className="text-light">Phone: (123) 456-7890</li>
             </ul>
           </Col>
         </Row>
-        <hr className="my-3 bg-secondary" />
+        {/* <hr className="my-3 bg-secondary" />
         <div className="text-center text-muted">
           <small>&copy; {new Date().getFullYear()} BookReader. All rights reserved.</small>
-        </div>
+        </div> */}
       </Container>
     </footer>
   )

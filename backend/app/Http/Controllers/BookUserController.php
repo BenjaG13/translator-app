@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\Auth;
 class BookUserController extends Controller
 {
 
-
-    
-
-
     public function getProgress($slug)
     {
         
@@ -49,5 +45,20 @@ class BookUserController extends Controller
         $user->books()->syncWithoutDetaching([$book->id => ['progress' => $progress]]);
 
         return response()->json(['message' => 'Progreso actualizado correctamente']);
+    }
+
+   // app/Http/Controllers/BookUserController.php
+    public function myBooks()
+    {
+        try {
+            $user = Auth::user();
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+            $books = $user->books()->with('genres')->get();
+            return response()->json($books, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al cargar los libros: ' . $e->getMessage()], 500);
+        }
     }
 }

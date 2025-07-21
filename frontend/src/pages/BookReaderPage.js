@@ -5,9 +5,8 @@ import { Pagination, Container, Button } from "react-bootstrap";
 import Sentence from "../components/Sentence";
 import { Link } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_API_URL+"/books";
+const API_URL = process.env.REACT_APP_API_URL + "/books";
 const SENTENCES_PER_PAGE = 10;
-const PAGES_PER_GROUP = 10; // Número de páginas a mostrar a la vez
 
 function BookReaderPage() {
   const { slug } = useParams();
@@ -16,14 +15,9 @@ function BookReaderPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [currentGroup, setCurrentGroup] = useState(0); // Grupo de páginas actual
 
   // Cargar progreso del usuario y oraciones al montar el componente
   useEffect(() => {
-
-    // localStorage.setItem("user", JSON.stringify("Ab"));
-    // localStorage.setItem("token", "2|aBXRMnAbk4NteH3VodiQf8oYrhHRZzZvuQ3xvicmc38334d8");
-
     const fetchData = async () => {
       try {
         // Obtener progreso del usuario desde la API
@@ -39,7 +33,6 @@ function BookReaderPage() {
         setSentences(fetchedSentences);
         const total = Math.ceil(fetchedSentences.length / SENTENCES_PER_PAGE);
         setTotalPages(total);
-        setCurrentGroup(Math.floor((savedPage - 1) / PAGES_PER_GROUP));
         setError(null);
       } catch (err) {
         setError(localStorage.getItem("name") + err);
@@ -53,6 +46,7 @@ function BookReaderPage() {
 
   // Manejar cambio de página y actualizar progreso en el backend
   const handlePageChange = async (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0); // Desplazar al inicio de la página
 
@@ -73,27 +67,6 @@ function BookReaderPage() {
   const endIndex = startIndex + SENTENCES_PER_PAGE;
   const currentSentences = sentences.slice(startIndex, endIndex);
 
-  // Calcular las páginas a mostrar en el grupo actual
-  const startPage = currentGroup * PAGES_PER_GROUP + 1;
-  const endPage = Math.min(startPage + PAGES_PER_GROUP - 1, totalPages);
-  const pages = [...Array(endPage - startPage + 1).keys()].map((i) => startPage + i);
-
-  // Manejar cambio al grupo siguiente
-  const handleNextGroup = () => {
-    if (endPage < totalPages) {
-      setCurrentGroup(currentGroup + 1);
-      setCurrentPage(startPage + PAGES_PER_GROUP);
-    }
-  };
-
-  // Manejar cambio al grupo anterior
-  const handlePrevGroup = () => {
-    if (currentGroup > 0) {
-      setCurrentGroup(currentGroup - 1);
-      setCurrentPage(startPage - PAGES_PER_GROUP);
-    }
-  };
-
   // Estados de carga y error
   if (loading) return <div className="text-center py-5 text-white">Cargando...</div>;
   if (error) return <div className="text-center py-5 text-danger">{error}</div>;
@@ -107,34 +80,35 @@ function BookReaderPage() {
 
         <h2 className="text-2xl font-bold mb-4">Leyendo: {slug}</h2>
 
-        {/* Mostrar oraciones de la página actual */}
-        {currentSentences.map((sentence, index) => (
-          <Sentence key={index} text={sentence} />
-        ))}
 
-        {/* Paginación */}
+        {/* Paginación simplificada */}
         {totalPages > 1 && (
           <Pagination className="mt-4 justify-content-center">
             <Pagination.Prev
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             />
-            {currentGroup > 0 && (
-              <Pagination.Ellipsis onClick={handlePrevGroup} />
-            )}
-            {pages.map((page) => (
-              <Pagination.Item
-                key={page}
-                active={page === currentPage}
-                onClick={() => handlePageChange(page)}
-                className={page === currentPage ? "bg-light text-dark" : "bg-dark text-white"}
-              >
-                {page}
-              </Pagination.Item>
-            ))}
-            {endPage < totalPages && (
-              <Pagination.Ellipsis onClick={handleNextGroup} />
-            )}
+            <Pagination.Item active>{currentPage}</Pagination.Item>
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        )}
+
+        {/* Mostrar oraciones de la página actual */}
+        {currentSentences.map((sentence, index) => (
+          <Sentence key={index} text={sentence} />
+        ))}
+
+        {/* Paginación simplificada */}
+        {totalPages > 1 && (
+          <Pagination className="mt-4 justify-content-center">
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Item active>{currentPage}</Pagination.Item>
             <Pagination.Next
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}

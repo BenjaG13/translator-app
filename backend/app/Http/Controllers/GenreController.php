@@ -5,15 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreGenreRequest;
 use App\Http\Requests\UpdateGenreRequest;
 use App\Models\Genre;
+use Illuminate\Http\JsonResponse;
 
 class GenreController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+     public function index(): JsonResponse
     {
-        //
+        try {
+            $genres = Genre::all();
+            return response()->json($genres, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al cargar los géneros: ' . $e->getMessage()], 500);
+        }
     }
 
     /**

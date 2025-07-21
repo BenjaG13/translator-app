@@ -1,27 +1,36 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Navbar, Container, Nav, Form, FormControl, Button, Dropdown, Modal } from "react-bootstrap";
+import { Navbar, Container, Nav, Form, FormControl, Button, Dropdown, Modal, Spinner } from "react-bootstrap";
 import { booksData } from "../data/books";
 import axios from "axios";
-import { AppContext } from '../context/appContext';
-
-
+import { AppContext } from "../context/appContext";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 function Header() {
-  const {state: { token }} = useContext(AppContext)
-  const {setToken} = useContext(AppContext)
+  const { state, setAuth, clearAuth } = useContext(AppContext);
+  const { token } = state;
   const [searchTerm, setSearchTerm] = useState("");
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [registerData, setRegisterData] = useState({ name: "", password: "" });
   const [loginData, setLoginData] = useState({ name: "", password: "" });
   const [error, setError] = useState(null);
+  const [genres, setGenres] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Estado para loading
   const navigate = useNavigate();
 
-  // Get unique genres for filter
-  const genres = ["All", ...new Set(booksData.map((book) => book.genre))];
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/genres`);
+        setGenres(["All", ...response.data.map(genre => genre.name)]);
+      } catch (err) {
+        console.error("Error al cargar géneros:", err);
+      }
+    };
+    fetchGenres();
+  }, []);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -36,62 +45,60 @@ function Header() {
     navigate(`/?genre=${genre}`);
   };
 
- 
-
   // Handle Register
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Iniciar loading
     try {
       const response = await axios.post(`${API_URL}/register`, registerData);
-      const { data, acces_token } = response.data;
-      localStorage.setItem("user", JSON.stringify(data));
-      localStorage.setItem("token", acces_token);
-      setToken(acces_token)
+      const { user, access_token } = response.data;
+      setAuth(access_token, user);
       setError(null);
       setShowRegister(false);
-      window.location.reload(); // Recargar para actualizar estado
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Error al registrarse");
+    } finally {
+      setIsLoading(false); // Finalizar loading
     }
   };
 
   // Handle Login
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Iniciar loading
     try {
       const response = await axios.post(`${API_URL}/login`, loginData);
-      const { user, accesstoken } = response.data;
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", accesstoken);
+      const { user, access_token } = response.data;
+      setAuth(access_token, user);
       setError(null);
       setShowLogin(false);
-      window.location.reload(); // Recargar para actualizar estado
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Error al iniciar sesión");
+    } finally {
+      setIsLoading(false); // Finalizar loading
     }
   };
 
   // Handle Logout
   const handleLogout = async () => {
     if (window.confirm("¿Seguro que quieres cerrar sesión?")) {
+      setIsLoading(true); // Iniciar loading
       try {
-        console.log(token)
-        await axios.post(
-          `${API_URL}/logout`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        // localStorage.removeItem("user");
-        localStorage.removeItem("token");
+        await axios.post(`${API_URL}/logout`, {}, {
+          headers: { Authorization: `Bearer ${state.token}` },
+        });
+        clearAuth(); // Limpiar contexto y localStorage
         navigate("/");
-        window.location.reload();
+        setIsLoading(false); // Finalizar loading
       } catch (err) {
         console.error("Error al cerrar sesión:", err);
+      } finally {
+        setIsLoading(false); // Finalizar loading
       }
     }
-  }
+  };
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
@@ -102,12 +109,11 @@ function Header() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/">
-              Home
-            </Nav.Link>
-            <Nav.Link as={Link} to="/?shelf=mylibrary">
-              My Library
-            </Nav.Link>
+            {state.token && (
+              <Nav.Link as={Link} to="/mylibrary">
+                My Library
+              </Nav.Link>
+            )}
             <Dropdown>
               <Dropdown.Toggle variant="dark" id="dropdown-basic">
                 Genres
@@ -134,18 +140,21 @@ function Header() {
               Search
             </Button>
           </Form>
-          {!token && <Button variant="outline-light" className="ms-2" onClick={() => setShowRegister(true)}>
-            Registrarse
-          </Button>
-          }
-          {!token && <Button variant="outline-light" className="ms-2" onClick={() => setShowLogin(true)}>
-            Login
-          </Button>
-        }
-          {token && <Button variant="outline-light" className="ms-2" onClick={() => handleLogout()}>
-              Logout
-          </Button>
-          }
+          {!state.token && (
+            <>
+              <Button variant="outline-light" className="ms-2" onClick={() => setShowRegister(true)} disabled={isLoading}>
+                Registrarse
+              </Button>
+              <Button variant="outline-light" className="ms-2" onClick={() => setShowLogin(true)} disabled={isLoading}>
+                Login
+              </Button>
+            </>
+          )}
+          {state.token && (
+            <Button variant="outline-light" className="ms-2" onClick={handleLogout} disabled={isLoading}>
+              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : `Logout ${state.user}`}
+            </Button>
+          )}
         </Navbar.Collapse>
       </Container>
 
@@ -164,6 +173,7 @@ function Header() {
                 value={registerData.name}
                 onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
                 required
+                disabled={isLoading}
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -173,10 +183,11 @@ function Header() {
                 value={registerData.password}
                 onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                 required
+                disabled={isLoading}
               />
             </Form.Group>
-            <Button variant="primary" type="submit">
-              Registrarse
+            <Button variant="primary" type="submit" disabled={isLoading}>
+              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : "Registrarse"}
             </Button>
           </Form>
         </Modal.Body>
@@ -197,6 +208,7 @@ function Header() {
                 value={loginData.name}
                 onChange={(e) => setLoginData({ ...loginData, name: e.target.value })}
                 required
+                disabled={isLoading}
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -206,10 +218,11 @@ function Header() {
                 value={loginData.password}
                 onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                 required
+                disabled={isLoading}
               />
             </Form.Group>
-            <Button variant="primary" type="submit">
-              Iniciar Sesión
+            <Button variant="primary" type="submit" disabled={isLoading}>
+              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : "Iniciar Sesión"}
             </Button>
           </Form>
         </Modal.Body>

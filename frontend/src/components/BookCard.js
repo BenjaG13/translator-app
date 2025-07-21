@@ -22,7 +22,7 @@ function BookCard({ book }) {
       <div style={{ height: "250px", overflow: "hidden" }}>
         <Card.Img
           variant="top"
-          src={book.coverImage}
+          src={book.cover_image}
           alt={book.title}
           style={{ objectFit: "cover", height: "100%", width: "100%" }}
         />

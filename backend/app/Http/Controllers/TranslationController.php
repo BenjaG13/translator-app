@@ -9,6 +9,7 @@ class TranslationController extends Controller
 {
     public function translate(Request $request)
     {
+        response()->json(['error' => 'llegueeee'], 500);
         
         $request->validate([
             'text' => 'required|string',
@@ -20,7 +21,7 @@ class TranslationController extends Controller
         $source = $request->input('source');
         $target = $request->input('target');
 
-        $libreTranslateUrl = 'http://libretranslate:5000/translate';
+        $libreTranslateUrl = 'http://libretranslate:5000/translate';                                                                                                                        
 
         try {
             $response = Http::post($libreTranslateUrl, [

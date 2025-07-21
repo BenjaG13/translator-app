@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
-import { Row, Col, Alert } from "react-bootstrap"
+import { Row, Col, Alert, Spinner } from "react-bootstrap" 
 import BookCard from "../components/BookCard"
 import axios from "axios"
 import { AppContext } from '../context/appContext';
@@ -12,6 +12,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 function HomePage() {
   const [books, setBooks] = useState([])
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false) // Nuevo estado para loading
   const location = useLocation()
 
   // Función para obtener los parámetros de búsqueda desde la URL
@@ -30,11 +31,12 @@ function HomePage() {
     if (params.searchTerm) queryParams.append("search", params.searchTerm)
     if (params.genre) queryParams.append("genre", params.genre)
     if (params.shelf) queryParams.append("shelf", params.shelf)
-    return `${API_URL+"/books"}?${queryParams.toString()}`
+    return `${API_URL}/books?${queryParams.toString()}` // Ajuste en la construcción de la URL
   }
 
   useEffect(() => {
     const fetchBooks = async () => {
+      setLoading(true) // Activar loading al inicio de la solicitud
       const searchParams = getSearchParams()
       const url = buildApiUrl(searchParams)
 
@@ -45,6 +47,8 @@ function HomePage() {
       } catch (err) {
         setError("Error al cargar los libros. Intenta nuevamente más tarde.")
         console.error(err)
+      } finally {
+        setLoading(false) // Desactivar loading al finalizar, éxito o error
       }
     }
     fetchBooks()
@@ -58,9 +62,16 @@ function HomePage() {
         {searchParams.shelf === "mylibrary" ? "Mi Biblioteca" : "Descubre Libros"}
       </h2>
 
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      {books.length === 0 && !error ? (
+      {loading ? (
+        <div className="text-center">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </Spinner>
+          <p>Cargando libros...</p>
+        </div>
+      ) : error ? (
+        <Alert variant="danger">{error}</Alert>
+      ) : books.length === 0 ? (
         <Alert variant="info">No se encontraron libros que coincidan con tus criterios. Ajusta tu búsqueda o filtros.</Alert>
       ) : (
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">

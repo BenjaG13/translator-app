@@ -6,6 +6,7 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use App\Models\Book;
 
 class BookController extends Controller
@@ -13,9 +14,25 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $books = Book::with('genres')->get();
+        $query = Book::with('genres');
+
+        // Filtrar por nombre si se proporciona el parámetro 'search'
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where('title', 'like', '%' . $searchTerm . '%');
+        }
+
+        // Filtrar por género si se proporciona el parámetro 'genre'
+        if ($request->has('genre')) {
+            $genre = $request->input('genre');
+            $query->whereHas('genres', function ($q) use ($genre) {
+                $q->where('name', $genre);
+            });
+        }
+
+        $books = $query->get();
         return response()->json($books, 200);
     }
 
@@ -93,19 +110,21 @@ class BookController extends Controller
             // Buscar el libro por slug
             $book = Book::where('slug', $slug)->firstOrFail();
 
-            // Validar longitud del texto para evitar problemas
-            // if (strlen($book->content) > 10000) {
-            //     return response()->json(['error' => 'El texto es demasiado largo'], 400);
-            // }
+            // Crear un archivo temporal y escribir el contenido
+            $tempFile = tempnam(sys_get_temp_dir(), 'book_content_');
+            file_put_contents($tempFile, $book->content);
 
-            // Escapar el texto para evitar inyecciones
-            $escapedText = escapeshellarg($book->content);
+            // Escapar la ruta del archivo temporal
+            $escapedFilePath = escapeshellarg($tempFile);
 
-            // Ejecutar el script de Python desde el entorno virtual
-            $command = "/opt/venv/bin/python /var/www/scripts/split_sentences.py {$escapedText} 2>&1";
+            // Ejecutar el script de Python pasando la ruta del archivo
+            $command = "/opt/venv/bin/python /var/www/scripts/split_sentences.py {$escapedFilePath} 2>&1";
             $output = [];
             $exitCode = null;
             exec($command, $output, $exitCode);
+
+            // Eliminar el archivo temporal
+            unlink($tempFile);
 
             // Verificar si hubo un error
             if ($exitCode !== 0) {

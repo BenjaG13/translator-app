@@ -4,6 +4,7 @@ import Header from "./components/Header"
 import HomePage from "./pages/HomePage"
 import BookDetailPage from "./pages/BookDetailPage"
 import BookReaderPage from "./pages/BookReaderPage"
+import MyLibraryPage from "./pages/MyLibraryPage";
 import Footer from "./components/Footer"
 import { AppProvider } from "./context/appContext";
 
@@ -18,6 +19,7 @@ function App() {
             <div className="container">
               <Routes>
                 <Route path="/" element={<HomePage />} />
+                <Route path="/mylibrary" element={<MyLibraryPage />} />
                 <Route path="/book/:slug" element={<BookDetailPage />} />
                 <Route path="/books/:slug/read" element={<BookReaderPage />} />
               </Routes>

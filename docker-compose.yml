@@ -1,35 +1,46 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
-    volumes:
-      - dbdata:/var/lib/mysql
-    ports:
-      - "3306:3306"
+  # db:
+  #   image: mysql:5.7
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: laravel
+  #     MYSQL_USER: laravel
+  #     MYSQL_PASSWORD: secret
+  #   volumes:
+  #     - dbdata:/var/lib/mysql
+  #   ports:
+  #     - "3306:3306"
 
   laravel:
     build:
       context: .
       dockerfile: backend/Dockerfile
+    # environment:
+    #   DB_CONNECTION: mysql
+    #   DB_HOST: db
+    #   DB_PORT: 3306
+    #   DB_DATABASE: laravel
+    #   DB_USERNAME: laravel
+    #   DB_PASSWORD: secret
     environment:
-      DB_CONNECTION: mysql
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: laravel
-      DB_USERNAME: laravel
-      DB_PASSWORD: secret
+      DB_CONNECTION: pgsql
+      DB_PORT: 5432
+      # DB_HOST: ep-green-lab-a8d61zj7-pooler.eastus2.azure.neon.tech
+      # DB_DATABASE: db_translator
+      # DB_USERNAME: neondb_owner
+      # DB_PASSWORD: npg_YfGm4sNHBa1K
+      # DB_SSLMODE: require
+      # DB_TRANSACTIONS: false
+      # DB_URL: postgresql://neondb_owner:npg_YfGm4sNHBa1K@ep-green-lab-a8d61zj7-pooler.eastus2.azure.neon.tech/db_translator?sslmode=require&channel_binding=require
+      DB_URL: postgresql://neondb_owner:npg_YfGm4sNHBa1K@ep-green-lab-a8d61zj7.eastus2.azure.neon.tech/db_translator?sslmode=require&channel_binding=require
     volumes:
       - ./backend:/var/www
     ports:
       - "9000:9000" 
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
 
   frontend:
     build:
@@ -62,5 +73,5 @@ services:
       - "5000:5000"
     command: --load-only=en,es
 
-volumes:
-  dbdata:
+# volumes:
+#   dbdata:

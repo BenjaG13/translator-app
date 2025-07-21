@@ -11,6 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+
+//         Schema::create('users', function (Blueprint $table) {
+//     $table->id();
+//     $table->string('name')->unique();
+// });
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
@@ -35,7 +41,7 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-    }
+      }
 
     /**
      * Reverse the migrations.
