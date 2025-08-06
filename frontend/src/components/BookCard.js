@@ -8,7 +8,7 @@ function BookCard({ book }) {
     <Card
       className="h-100 shadow-sm book-card"
       as={Link}
-      to={`/book/${book.slug}`}
+      to={`/${book.slug}`}
       style={{
         cursor: "pointer",
         transition: "transform 0.2s",
@@ -31,10 +31,11 @@ function BookCard({ book }) {
         <Card.Title className="text-truncate">{book.title}</Card.Title>
         <Card.Subtitle className="mb-2 text-muted">{book.author}</Card.Subtitle>
         <div className="mt-auto">
-          <Badge bg="primary" className="me-1">
-            {book.genre}
+          {book.genres.map((genre, index) => ( 
+          <Badge key={index} bg="secondary" className="me-1">
+            {genre.name}
           </Badge>
-          <Badge bg="secondary">{book.year}</Badge>
+          ))}
         </div>
       </Card.Body>
     </Card>

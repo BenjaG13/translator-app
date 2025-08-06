@@ -20,8 +20,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/mylibrary" element={<MyLibraryPage />} />
-                <Route path="/book/:slug" element={<BookDetailPage />} />
-                <Route path="/books/:slug/read" element={<BookReaderPage />} />
+                <Route path="/:slug" element={<BookDetailPage />} />
+                <Route path="/:slug/read" element={<BookReaderPage />} />
               </Routes>
             </div>
           </main>

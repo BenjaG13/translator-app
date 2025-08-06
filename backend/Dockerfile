@@ -1,17 +1,19 @@
-# Cambia la imagen base a PHP 8.2 con FPM
-FROM php:8.2-fpm
+# Etapa base: Configuración común para desarrollo y producción
+FROM php:8.2-fpm AS base
 
-# Instala las dependencias del sistema y extensiones de PHP necesarias
+# Instala dependencias del sistema y extensiones de PHP
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     libpq-dev \
-    && docker-php-ext-install pdo_pgsql zip
+    && docker-php-ext-install pdo_pgsql zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Instala Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-
+# Instala Python y dependencias
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -30,18 +32,33 @@ RUN pip install --no-cache-dir setuptools wheel cython \
     && pip install --no-cache-dir spacy==3.5.0 \
     && python -m spacy download en_core_web_sm
 
-    
 # Establece el directorio de trabajo
 WORKDIR /var/www
 
-# Copia los archivos de tu proyecto al contenedor
+# Copia los archivos del proyecto
 COPY backend/ .
 
+# Copia la configuración de PHP-FPM
+#COPY backend/php-fpm.conf /usr/local/etc/php-fpm.d/zz-custom.conf
 
-COPY backend/php-fpm.conf /usr/local/etc/php-fpm.d/zz-custom.conf
+# Etapa de desarrollo
+FROM base AS development
 
-# Instala las dependencias de Composer
-RUN composer install
+# Instala dependencias de Composer, incluyendo las de desarrollo
+RUN composer install --dev
+
+# Inicia PHP-FPM
+CMD ["php-fpm"]
+
+# Etapa de producción
+FROM base AS production
+
+# Instala solo las dependencias de producción y optimiza el autoloader
+RUN composer install --no-dev --optimize-autoloader
+
+# Establece permisos para Laravel
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
 
 # Inicia PHP-FPM
 CMD ["php-fpm"]

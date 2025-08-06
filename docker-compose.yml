@@ -1,31 +1,14 @@
 version: '3.8'
 
 services:
-  # db:
-  #   image: mysql:5.7
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: root
-  #     MYSQL_DATABASE: laravel
-  #     MYSQL_USER: laravel
-  #     MYSQL_PASSWORD: secret
-  #   volumes:
-  #     - dbdata:/var/lib/mysql
-  #   ports:
-  #     - "3306:3306"
 
   laravel:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    # environment:
-    #   DB_CONNECTION: mysql
-    #   DB_HOST: db
-    #   DB_PORT: 3306
-    #   DB_DATABASE: laravel
-    #   DB_USERNAME: laravel
-    #   DB_PASSWORD: secret
+      target: development  
     env_file:
-      - .env      
+      - .env.dev
     volumes:
       - ./backend:/var/www
     ports:
@@ -35,8 +18,9 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: frontend
       dockerfile: Dockerfile
+      target: development
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -51,6 +35,8 @@ services:
     build:
       context: .
       dockerfile: caddy/Dockerfile
+    volumes:
+    - ./caddy/Caddyfile.dev:/etc/caddy/Caddyfile
     ports:
       - "80:80"
     depends_on:
@@ -64,5 +50,16 @@ services:
       - "5000:5000"
     command: --load-only=en,es
 
-# volumes:
-#   dbdata:
+
+  db:
+    image: postgres:14
+    env_file:
+      - .env.dev
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+volumes:
+  dbdata:

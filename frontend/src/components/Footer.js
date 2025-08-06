@@ -38,8 +38,8 @@ function Footer() {
           <Col md={4}>
             <h5>Contact</h5>
             <ul className="list-unstyled">
-              <li className="text-light">contact@bookreader.com</li>
-              <li className="text-light">Phone: (123) 456-7890</li>
+              <li className="text-light">Github: BenjaG13</li>
+              {/* <li className="text-light">Phone: (123) 456-7890</li> */}
             </ul>
           </Col>
         </Row>

@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Row, Col, Button, Image, Badge, Tabs, Tab, Modal, Form } from "react-bootstrap";
 import axios from "axios";
+import  LoadingSpinner  from "../components/LoadingSpinner";
 import { AppContext } from "../context/appContext";
 
 const API_URL = process.env.REACT_APP_API_URL + "/books";
@@ -52,7 +53,7 @@ function BookDetailPage() {
 
   const handleReadNow = () => {
     if (token) {
-      navigate(`/books/${slug}/read`);
+      navigate(`/${slug}/read`);
     } else {
       setShowLogin(true);
     }
@@ -66,14 +67,16 @@ function BookDetailPage() {
       setAuth(access_token, user);
       setLoginError(null);
       setShowLogin(false);
-      navigate(`/books/${slug}/read`);
+      navigate(`/${slug}/read`);
     } catch (err) {
       setLoginError(err.response?.data?.message || "Error al iniciar sesión");
     }
   };
 
   if (loading) {
-    return <div className="text-center py-5">Cargando...</div>;
+    // return <div className="text-center py-5">Cargando...</div>;
+    // return <LoadingSpinner className="text-center py-5" />;
+    return <LoadingSpinner className="text-center py-5" />;
   }
 
   if (error) {
@@ -87,7 +90,7 @@ function BookDetailPage() {
   return (
     <div>
       <Button variant="outline-primary" as={Link} to="/" className="mb-4">
-        ← Volver a Lios {localStorage.getItem('name') + "n"}
+        ← Volver a Libros 
       </Button>
 
       <Row>

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Pagination, Container, Button } from "react-bootstrap";
 import Sentence from "../components/Sentence";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { Link } from "react-router-dom";
 
 const API_URL = process.env.REACT_APP_API_URL + "/books";
@@ -18,6 +19,7 @@ function BookReaderPage() {
 
   // Cargar progreso del usuario y oraciones al montar el componente
   useEffect(() => {
+    setLoading(true);
     const fetchData = async () => {
       try {
         // Obtener progreso del usuario desde la API
@@ -68,13 +70,15 @@ function BookReaderPage() {
   const currentSentences = sentences.slice(startIndex, endIndex);
 
   // Estados de carga y error
-  if (loading) return <div className="text-center py-5 text-white">Cargando...</div>;
+  if (loading) {
+    return <LoadingSpinner className="text-center py-5" />;
+  }  
   if (error) return <div className="text-center py-5 text-danger">{error}</div>;
 
   return (
     <div className="bg-dark min-vh-100 text-white d-flex flex-column">
       <Container className="py-5 flex-grow-1">
-        <Button variant="outline-light" as={Link} to={`/books/${slug}`} className="mb-4">
+        <Button variant="outline-light" as={Link} to={`/${slug}`} className="mb-4">
           ← Volver a Detalles del Libro
         </Button>
 

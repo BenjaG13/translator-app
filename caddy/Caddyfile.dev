@@ -1,24 +1,15 @@
 :80 {
-
     root * /var/www/public
     encode gzip
-
     log {
         output file /var/log/caddy/access.log
         format json
     }
-
-# Manejar las rutas del backend (/api/*)
     handle /api/* {
-        # Reescribir la solicitud a /index.php para Laravel
         rewrite * /index.php
-        # Pasar la solicitud a PHP-FPM
         php_fastcgi laravel:9000
     }
-
-# Manejar las rutas del frontend
     handle {
         reverse_proxy frontend:3000
     }
-
 }

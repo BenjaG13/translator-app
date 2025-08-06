@@ -128,6 +128,10 @@ function Header() {
             </Dropdown>
           </Nav>
           <Form className="d-flex" onSubmit={handleSearchSubmit}>
+
+            <Button variant="outline-light" type="submit" className="me-2">
+              Search
+            </Button>
             <FormControl
               type="search"
               placeholder="Search books..."
@@ -136,23 +140,20 @@ function Header() {
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            <Button variant="outline-light" type="submit">
-              Search
-            </Button>
           </Form>
           {!state.token && (
             <>
-              <Button variant="outline-light" className="ms-2" onClick={() => setShowRegister(true)} disabled={isLoading}>
+              <Button variant="outline-primary" className="ms-2" onClick={() => setShowRegister(true)} disabled={isLoading}>
                 Registrarse
               </Button>
-              <Button variant="outline-light" className="ms-2" onClick={() => setShowLogin(true)} disabled={isLoading}>
+              <Button variant="outline-primary" className="ms-2" onClick={() => setShowLogin(true)} disabled={isLoading}>
                 Login
               </Button>
             </>
-          )}
+          )} 
           {state.token && (
-            <Button variant="outline-light" className="ms-2" onClick={handleLogout} disabled={isLoading}>
-              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : `Logout ${state.user}`}
+            <Button variant="outline-danger" className="ms-2" onClick={handleLogout} disabled={isLoading}>
+              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : `Lgout ${state.user}`}
             </Button>
           )}
         </Navbar.Collapse>
