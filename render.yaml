@@ -1,10 +1,10 @@
 services:
   - type: web
+    runtime: docker
     name: translator-backend
-    env: docker
-    plan: free  # O starter si necesitas más recursos
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    plan: free
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     numInstances: 1
     envVars:
       - key: DB_CONNECTION
@@ -13,32 +13,29 @@ services:
         sync: false
       - key: DB_URL
         sync: false
-    
+
   - type: web
+    runtime: docker
     name: translator-frontend
-    env: docker
     plan: free
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: frontend
     numInstances: 1
-    
 
   - type: web
+    runtime: docker
     name: translator-caddy
-    env: docker
     plan: free
-    dockerfilePath: ./caddy/Dockerfile
-    dockerContext: ./caddy
+    dockerfilePath: caddy/Dockerfile
+    dockerContext: caddy
     numInstances: 1
-    
 
   - type: web
+    runtime: image
     name: translator-libretranslate
-    env: image
     plan: free
-    repo: libretranslate/libretranslate
+    image:
+      url: docker.io/libretranslate/libretranslate:latest
+    dockerCommand: --load-only=en,es   # si querés pasar el flag al CMD de la imagen
     numInstances: 1
-    envVars:
-      - key: COMMAND
-        value: --load-only=en,es
     
