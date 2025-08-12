@@ -34,7 +34,7 @@ services:
 
   - type: web
     name: translator-libretranslate
-    env: docker
+    env: image
     plan: free
     repo: libretranslate/libretranslate
     numInstances: 1
