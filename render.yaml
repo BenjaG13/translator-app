@@ -36,7 +36,7 @@ services:
     name: translator-libretranslate
     env: image
     plan: free
-    image: libretranslate/libretranslate
+    repo: libretranslate/libretranslate
     numInstances: 1
     envVars:
       - key: COMMAND
