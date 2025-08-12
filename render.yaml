@@ -13,10 +13,7 @@ services:
         sync: false
       - key: DB_URL
         sync: false
-    ports:
-      - port: 9000
-        to: 9000
-
+    
   - type: web
     name: translator-frontend
     env: docker
@@ -24,9 +21,7 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     numInstances: 1
-    ports:
-      - port: 80
-        to: 80
+    
 
   - type: web
     name: translator-caddy
@@ -35,19 +30,15 @@ services:
     dockerfilePath: ./caddy/Dockerfile
     dockerContext: ./caddy
     numInstances: 1
-    ports:
-      - port: 80
-        to: 80
+    
 
   - type: web
     name: translator-libretranslate
     env: docker
     plan: free
-    image: libretranslate/libretranslate
+    repo: libretranslate/libretranslate
     numInstances: 1
     envVars:
       - key: COMMAND
         value: --load-only=en,es
-    ports:
-      - port: 5000
-        to: 5000
+    
