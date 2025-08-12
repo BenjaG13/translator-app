@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: translator-backend
+    env: docker
+    plan: free  # O starter si necesitas más recursos
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    numInstances: 1
+    envVars:
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        sync: false
+      - key: DB_URL
+        sync: false
+
+  - type: web
+    name: translator-frontend
+    env: docker
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    numInstances: 1
+
+  - type: web
+    name: translator-caddy
+    env: docker
+    plan: free
+    dockerfilePath: ./caddy/Dockerfile
+    dockerContext: ./caddy
+    numInstances: 1
+
+  - type: web
+    name: translator-libretranslate
+    env: docker
+    plan: free
+    image: libretranslate/libretranslate
+    numInstances: 1
+    envVars:
+      - key: COMMAND
+        value: --load-only=en,es
+

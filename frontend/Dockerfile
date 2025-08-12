@@ -33,6 +33,8 @@ FROM nginx:alpine AS production
 # Copia los assets construidos desde la etapa builder
 COPY --from=builder /app/build /usr/share/nginx/html
 
+COPY default.conf /etc/nginx/conf.d/default.conf
+
 # Expone el puerto 80
 EXPOSE 80
 
