@@ -36,7 +36,7 @@ RUN pip install --no-cache-dir setuptools wheel cython \
 WORKDIR /var/www
 
 # Copia los archivos del proyecto
-COPY backend/ .
+COPY . .
 
 # Copia la configuración de PHP-FPM
 #COPY backend/php-fpm.conf /usr/local/etc/php-fpm.d/zz-custom.conf
