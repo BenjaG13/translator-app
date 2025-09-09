@@ -9,10 +9,10 @@
 
     handle /api/* {
         rewrite * /index.php
-        php_fastcgi translator-backend:9000
+        php_fastcgi laravel:9000
     }
 
     handle {
-        reverse_proxy translator-frontend:80
+        reverse_proxy frontend:80
     }
 }
