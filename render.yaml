@@ -12,7 +12,7 @@ services:
       - key: APP_DEBUG
         value: 'false'
 
-  - type: private_service
+  - type: web
     name: laravel
     runtime: docker
     dockerfilePath: backend/Dockerfile
@@ -25,24 +25,25 @@ services:
         value: 'false'
       - key: DB_CONNECTION
         sync: false
-      - key: DB_HOST
-        sync: false
       - key: DB_PORT
         sync: false
       - key: DB_URL
         sync: false
 
-  - type: private_service
+  - type: web
     name: frontend
     runtime: docker
     dockerfilePath: frontend/Dockerfile
     dockerContext: frontend
     numInstances: 1
 
-  - type: private_service
+  - type: web
     name: libretranslate
     runtime: image
     image:
       url: docker.io/libretranslate/libretranslate:latest
     dockerCommand: --load-only=en,es
     numInstances: 1
+
+
+
