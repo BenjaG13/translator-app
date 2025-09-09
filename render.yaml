@@ -1,12 +1,23 @@
 services:
   - type: web
+    name: caddy
     runtime: docker
-    name: laravel                # must match Caddy php_fastcgi target
+    dockerfilePath: caddy/Dockerfile
+    dockerContext: caddy
     plan: free
+    numInstances: 1
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: 'false'
+
+  - type: private_service
+    name: laravel
+    runtime: docker
     dockerfilePath: backend/Dockerfile
     dockerContext: backend
     numInstances: 1
-    port: 9000                   # php-fpm escucha en 9000 en tu imagen
     envVars:
       - key: APP_ENV
         value: production
@@ -14,36 +25,24 @@ services:
         value: 'false'
       - key: DB_CONNECTION
         sync: false
+      - key: DB_HOST
+        sync: false
       - key: DB_PORT
-        sync: false              # marcar secrets / valores sensibles para completarlos en Dashboard
+        sync: false
       - key: DB_URL
         sync: false
-      
 
-  - type: web
+  - type: private_service
+    name: frontend
     runtime: docker
-    name: frontend               # must match Caddy reverse_proxy target
-    plan: free
     dockerfilePath: frontend/Dockerfile
     dockerContext: frontend
     numInstances: 1
-    port: 80                     # nginx dentro de la imagen frontend sirve en 80
 
-  - type: web
-    runtime: docker
-    name: caddy
-    plan: free
-    dockerfilePath: caddy/Dockerfile
-    dockerContext: caddy
-    numInstances: 1
-    port: 80
-  
-  - type: web
-    runtime: image
+  - type: private_service
     name: libretranslate
-    plan: free
+    runtime: image
     image:
       url: docker.io/libretranslate/libretranslate:latest
     dockerCommand: --load-only=en,es
     numInstances: 1
-    port: 5000
