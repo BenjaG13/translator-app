@@ -1,3 +1,6 @@
+# backend/Dockerfile
+
+# ---------------------------
 # Etapa de build para Python
 # ---------------------------
 FROM python:3.11-slim AS python-build
@@ -17,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Mejorar pip y usar prefer-binary cuando convenga
+# Mejorar pip
 RUN python -m pip install --upgrade pip setuptools wheel
 
 # Instalar paquetes Python en el venv
@@ -33,18 +36,18 @@ RUN pip install --no-cache-dir cython \
 FROM php:8.2-fpm AS base
 
 # COPIAR EL RUNTIME DE PYTHON Y EL VENV desde python-build
-# (copiamos /usr/local/bin y /usr/local/lib para incluir el intérprete y libs necesarias)
 COPY --from=python-build /usr/local/bin /usr/local/bin
 COPY --from=python-build /usr/local/lib /usr/local/lib
 COPY --from=python-build /opt/venv /opt/venv
 
-# Añadir venv al PATH
 ENV PATH="/opt/venv/bin:${PATH}"
 
-# Instalar extensiones y dependencias del sistema para PHP
+# Instalar nginx y dependencias de PHP
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx \
     libzip-dev \
     zip \
+    unzip \
     libpq-dev \
     && docker-php-ext-install pdo_pgsql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -52,23 +55,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Forzar php-fpm a escuchar en TCP 127.0.0.1:9000 (asegura conexión nginx -> php-fpm)
+RUN sed -i 's|listen = .*|listen = 127.0.0.1:9000|' /usr/local/etc/php-fpm.d/www.conf
+
 # Directorio de trabajo
 WORKDIR /var/www
 
-# COPIAR código de la aplicación (context = backend)
+# Copiar código de la app (context backend)
 COPY . .
+
+# Copiar configuración y entrypoint (asegurate de tener estos archivos en backend/docker/)
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Exponer puerto HTTP (documentativo; Render detecta HTTP)
+EXPOSE 80
 
 # ---------------------------
 # Etapa de desarrollo
 # ---------------------------
 FROM base AS development
 
-# Instalar dependencias de Composer para desarrollo
-RUN composer install --no-dev --optimize-autoloader || true
-# (se usa --no-dev para evitar problemas en caso de que quieras que dev deps estén en host;
-# ajustá a `--dev` si querés deps dev en contenedor)
+# Instalar dependencias para desarrollo (incluye dev deps si querés)
+RUN composer install --no-interaction --ignore-platform-reqs || true
 
-CMD ["php-fpm"]
+CMD ["sh", "/usr/local/bin/entrypoint.sh"]
 
 # ---------------------------
 # Etapa de producción
@@ -76,10 +88,11 @@ CMD ["php-fpm"]
 FROM base AS production
 
 # Instalar dependencias de Composer para producción
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Permisos
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage
 
-CMD ["php-fpm"]
+# Start (php-fpm + nginx)
+CMD ["sh", "/usr/local/bin/entrypoint.sh"]
