@@ -23,8 +23,8 @@ services:
 
   caddy:
     build:
-      context: .
-      dockerfile: caddy/Dockerfile
+      context: caddy
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     depends_on:

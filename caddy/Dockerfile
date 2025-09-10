@@ -4,4 +4,4 @@ RUN apk add --no-cache libcap-setcap \
  && setcap -r /usr/bin/caddy \
  && getcap /usr/bin/caddy || true
 
-COPY caddy/Caddyfile.prod /etc/caddy/Caddyfile 
+COPY Caddyfile.prod /etc/caddy/Caddyfile 
