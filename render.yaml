@@ -43,15 +43,9 @@ services:
     runtime: image
     plan: free
     image:
-      url: docker.io/benjag13/libretranslate
+      url: docker.io/benjag13/libretranslate:preloaded
     numInstances: 1
-    # envVars:
-    #   - key: LT_LOAD_ONLY
-    #     value: en,es
-    #   - key: LT_HOST
-    #     value: 0.0.0.0
-    #   - key: PORT
-    #     value: "5000"
+    
 
 
 
