@@ -39,7 +39,7 @@ services:
 
   - type: web
     name: libretranslate
-    runtime: docker #image
+    runtime: image
     plan: free
     image:
       url: docker.io/libretranslate/libretranslate:latest
