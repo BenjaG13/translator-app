@@ -40,10 +40,14 @@ services:
   - type: web
     name: libretranslate
     runtime: image
+    plan: free
     image:
       url: docker.io/libretranslate/libretranslate:latest
-    dockerCommand: --load-only=en,es
     numInstances: 1
+    envVars:
+      - key: LT_LOAD_ONLY
+        value: en,es
+
 
 
 
