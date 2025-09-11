@@ -1,18 +1,32 @@
 :80 {
-    root * /var/www/public
+    # gzip/encode responses
     encode gzip
 
+    # logs en formato json (opcional)
     log {
         output file /var/log/caddy/access.log
         format json
     }
 
-    handle /api/* {
-        rewrite * /index.php
-        php_fastcgi laravel:9000
+    # Proxy de la API al backend (usa BACKEND_URL; debe incluir esquema y host, p.ej. http://laravel:80
+    # o https://translator-backend.onrender.com)
+    @api path /api/*
+
+    handle @api {
+        reverse_proxy {env.BACKEND_URL} {
+            # reenviamos cabeceras comunes
+            header_up Host {http.request.host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote_host}
+        }
     }
 
+    # Todo lo demás -> frontend (FRONTEND_URL debe ser algo como http://frontend:80 o https://translator-frontend.onrender.com)
     handle {
-        reverse_proxy frontend:80
+        reverse_proxy {env.FRONTEND_URL} {
+            header_up Host {http.request.host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote_host}
+        }
     }
 }

@@ -38,13 +38,13 @@ services:
     numInstances: 1
 
 
-  - type: web
-    name: libretranslate
-    runtime: image
-    plan: free
-    image:
-      url: docker.io/benjag13/libretranslate:preloaded
-    numInstances: 1
+  # - type: web
+  #   name: libretranslate
+  #   runtime: image
+  #   plan: free
+  #   image:
+  #     url: docker.io/benjag13/libretranslate:preloaded
+  #   numInstances: 1
     
 
 
