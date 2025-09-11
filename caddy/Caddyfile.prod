@@ -13,7 +13,7 @@
     @api path /api/*
 
     handle @api {
-        reverse_proxy {env.BACKEND_URL} {
+        reverse_proxy https://translator-frontend-8b1v.onrender.com {
             # reenviamos cabeceras comunes
             header_up Host {http.request.host}
             header_up X-Forwarded-Proto {scheme}
@@ -23,7 +23,7 @@
 
     # Todo lo demás -> frontend (FRONTEND_URL debe ser algo como http://frontend:80 o https://translator-frontend.onrender.com)
     handle {
-        reverse_proxy {env.FRONTEND_URL} {
+        reverse_proxy https://translator-backend-laca.onrender.com {
             header_up Host {http.request.host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
