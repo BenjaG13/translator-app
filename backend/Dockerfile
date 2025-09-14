@@ -1,11 +1,8 @@
-# backend/Dockerfile
-
 # ---------------------------
 # Etapa de build para Python
 # ---------------------------
 FROM python:3.11-slim AS python-build
 
-# Dependencias del sistema necesarias para compilar paquetes científicos
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libblas-dev \
@@ -16,14 +13,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Crear el virtualenv en /opt/venv
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Mejorar pip
 RUN python -m pip install --upgrade pip setuptools wheel
 
-# Instalar paquetes Python en el venv
 RUN pip install --no-cache-dir cython \
  && pip install --no-cache-dir numpy==1.26.4 \
  && pip install --no-cache-dir typing-extensions==4.12.2 \
@@ -52,6 +46,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-install pdo_pgsql zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Eliminar posibles archivos "default" que traiga nginx para evitar conflictos
+RUN rm -f /etc/nginx/conf.d/default.conf || true \
+ && rm -f /etc/nginx/conf.d/*default* || true \
+ && rm -f /etc/nginx/sites-enabled/default || true \
+ && rm -f /etc/nginx/sites-available/default || true
+
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -77,7 +77,6 @@ EXPOSE 80
 # ---------------------------
 FROM base AS development
 
-# Instalar dependencias para desarrollo (incluye dev deps si querés)
 RUN composer install --no-interaction --ignore-platform-reqs || true
 
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]
@@ -87,12 +86,9 @@ CMD ["sh", "/usr/local/bin/entrypoint.sh"]
 # ---------------------------
 FROM base AS production
 
-# Instalar dependencias de Composer para producción
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Permisos
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage
 
-# Start (php-fpm + nginx)
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]
