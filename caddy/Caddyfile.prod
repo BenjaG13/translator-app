@@ -1,29 +1,39 @@
 :80 {
-    # gzip/encode responses
+    # gzip responses
     encode gzip
 
-    # logs en formato json (opcional)
     log {
         output file /var/log/caddy/access.log
         format json
     }
 
-    # API -> backend (asegurate que este dominio es el público del backend en Render)
+    # API -> backend público de Render (forzamos Host al upstream)
     @api path /api/*
     handle @api {
-        reverse_proxy https://translator-backend-laca.onrender.com {
-            # No sobreescribimos Host (dejamos el valor por defecto)
-            # Pasamos cabeceras estándar X-Forwarded
+        reverse_proxy translator-backend-laca.onrender.com:443 {
+            transport http {
+                tls
+                # Si hay problemas con verificación de certificado, usar la linea siguiente temporalmente:
+                tls_insecure_skip_verify
+            }
+            # Forzamos Host hacia el hostname público del backend para evitar re-routing a Caddy
+            header_up Host translator-backend-laca.onrender.com
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Host {http.request.host}
         }
     }
 
-    # Todo lo demás -> frontend (dominio público del frontend en Render)
+    # Resto -> frontend público de Render
     handle {
-        reverse_proxy https://translator-frontend-8b1v.onrender.com {
+        reverse_proxy translator-frontend-8b1v.onrender.com:443 {
+            transport http {
+                tls
+            }
+            header_up Host translator-frontend-8b1v.onrender.com
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Host {http.request.host}
         }
     }
 }
