@@ -37,5 +37,6 @@ Route::post('register', [UserController::class, 'register']);
 
 Route::post('/translate', [TranslationController::class, 'translate']);
 
+Route::get('/health', function () { return response()->json(['ok' => true]); });
 
 
