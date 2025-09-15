@@ -8,6 +8,10 @@
         format json
     }
 
+    # Cachear assets estáticos
+    @static path /static/* /favicon.ico /logo192.png /logo512.png
+    header @static Cache-Control "public, max-age=86400, s-maxage=86400
+
     # API -> backend público de Render (forzamos Host al upstream correcto)
     @api path /api/*
     handle @api {
