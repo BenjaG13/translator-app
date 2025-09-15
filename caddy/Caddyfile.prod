@@ -2,38 +2,59 @@
     # gzip responses
     encode gzip
 
+    # Access log to stdout (JSON) -> Render mostrará esto en Live Logs
     log {
-        output file /var/log/caddy/access.log
-        format json
+        output stdout
+        format json {
+            # campos recomendados (caddy rellenará los valores)
+            time     {when}
+            remote   {remote}
+            proto    {proto}
+            method   {http.request.method}
+            path     {http.request.uri.path}
+            query    {http.request.uri.query}
+            host     {http.request.host}
+            status   {http.response.status}
+            size     {http.response.size}
+            duration {http.duration}
+            up       {http.reverse_proxy.upstream}
+            up_status {http.reverse_proxy.upstream.status}
+            user_agent {http.request.header.User-Agent}
+            cf_ray   {http.request.header.Cf-Ray}
+            rndr_id  {http.request.header.Rndr-Id}
+        }
     }
 
-    # API -> backend público de Render (forzamos Host al upstream)
+    # Error log to stderr (Caddy by default logs errors to stderr; esto ayuda a que Render los muestre)
+    # (Si querés agregar más verbosity podés setear env var CADDY_LOG_LEVEL=DEBUG en Render)
+    # handle_errors {
+    #     # opcional: custom error page o log
+    # }
+
+    # API -> backend público de Render (forzamos Host al upstream correcto)
     @api path /api/*
     handle @api {
-        reverse_proxy translator-backend-laca.onrender.com:443 {
+        reverse_proxy https://translator-backend-laca.onrender.com:443 {
             transport http {
                 tls
-                # Si hay problemas con verificación de certificado, usar la linea siguiente temporalmente:
-                tls_insecure_skip_verify
+                # si necesitás debugging temporal:
+                # tls_insecure_skip_verify
             }
-            # Forzamos Host hacia el hostname público del backend para evitar re-routing a Caddy
+            # Enviamos Host del upstream (evita loops)
             header_up Host translator-backend-laca.onrender.com
+            # pasamos X-Forwarded (opcional)
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
-            header_up X-Forwarded-Host {http.request.host}
         }
     }
 
     # Resto -> frontend público de Render
     handle {
-        reverse_proxy translator-frontend-8b1v.onrender.com:443 {
-            transport http {
-                tls
-            }
+        reverse_proxy https://translator-frontend-8b1v.onrender.com:443 {
+            transport http { tls }
             header_up Host translator-frontend-8b1v.onrender.com
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
-            header_up X-Forwarded-Host {http.request.host}
         }
     }
 }
