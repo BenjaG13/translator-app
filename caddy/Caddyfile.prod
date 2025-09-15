@@ -25,7 +25,9 @@
     # Resto -> frontend público de Render
     handle {
         reverse_proxy https://translator-frontend-8b1v.onrender.com {
-            transport http { tls }
+            transport http { 
+                tls 
+            }
             header_up Host translator-frontend-8b1v.onrender.com
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
