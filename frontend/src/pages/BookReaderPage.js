@@ -11,6 +11,7 @@ const SENTENCES_PER_PAGE = 10;
 
 function BookReaderPage() {
   const { slug } = useParams();
+  const [titulo, setTitulo] = useState("") 
   const [sentences, setSentences] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +47,7 @@ function BookReaderPage() {
     fetchData();
   }, [slug]);
 
+
   // Manejar cambio de página y actualizar progreso en el backend
   const handlePageChange = async (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
@@ -60,9 +62,15 @@ function BookReaderPage() {
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
     } catch (err) {
-      console.error("Error al actualizar progreso:", err);
+      console.error("Error al actualizar progreso:", err); 
     }
   };
+
+  useEffect(() => {
+    const tittle = slug.replace(/[-_]+/g, " "); 
+    const titulo = tittle.replace(/\b\w/g, (c) => c.toUpperCase())
+    setTitulo(titulo);
+  }, []);
 
   // Calcular oraciones a mostrar en la página actual
   const startIndex = (currentPage - 1) * SENTENCES_PER_PAGE;
@@ -82,7 +90,7 @@ function BookReaderPage() {
           ← Volver a Detalles del Libro
         </Button>
 
-        <h2 className="text-2xl font-bold mb-4">Leyendo: {slug}</h2>
+        <h2 className="text-2xl font-bold mb-4">Leyendo: {titulo}</h2>
 
 
         {/* Paginación simplificada */}

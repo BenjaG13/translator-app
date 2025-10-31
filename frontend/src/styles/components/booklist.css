@@ -1,0 +1,148 @@
+/* --- BookCard / placeholders: garantizamos tamaño y comportamiento idéntico --- */
+
+/* wrapper para asegurar que el BookCard ocupe todo el alto del col */
+.book-card-wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+/* cards (BookCard y placeholder) */
+.book-card,
+.placeholder-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Imagen responsiva con aspect-ratio (portada 2:3) */
+.card-image {
+  width: 100%;
+  aspect-ratio: 2 / 3;    /* mantiene misma relación que el placeholder */
+  max-height: 480px;
+  overflow: hidden;
+  background-color: #2b2b2b;
+  display: block;
+}
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* También soportamos si usás Card.Img en lugar de img */
+.book-card img,
+.book-card .card-img-top {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* fallback si aspect-ratio no soportado */
+@supports not (aspect-ratio: 1/1) {
+  .card-image { height: 300px; }
+  .card-image img { height: 100%; width: 100%; object-fit: cover; }
+}
+
+/* Placeholder shimmer — igual que antes, asegura mismo look */
+.placeholder-image {
+  background: linear-gradient(90deg, #2b2b2b 0%, #323232 50%, #2b2b2b 100%);
+  background-size: 200% 100%;
+  animation: placeholderShimmer 1.6s linear infinite;
+}
+@keyframes placeholderShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Hover & focus para la card (quitamos inline JS) */
+.book-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  text-decoration: none;
+  color: inherit;
+}
+.book-card:hover,
+.book-card:focus {
+  transform: scale(1.03);
+  z-index: 2;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+/* Card.Body flex para empujar badges abajo */
+.book-card .card-body,
+.placeholder-card .card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem;
+}
+
+/* truncar títulos largos */
+.book-card .card-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card .card-body,
+.placeholder-card .card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem;
+  flex: 1 1 auto;
+  box-sizing: border-box;
+}
+
+/* contenedor para título+subtítulo; fijamos una min-height consistente */
+/* Ajusta 3.6rem si querés más/menos (depende del font-size y line-height) */
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  /* Reservamos espacio suficiente para 2 líneas de título + 1 línea de subtítulo */
+  min-height: 3.6rem;
+  /* Evitamos que empuje el resto */
+  flex: 0 0 auto;
+}
+
+/* Título: permitimos máximo 2 líneas y truncamos con line-clamp */
+.card-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.15rem;
+  /* multiline truncation (WebKit + modern browsers) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Subtitulo: 1 línea, truncado */
+.card-subtitle {
+  font-size: 0.9rem;
+  color: #6c757d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Aseguramos que la sección de badges quede siempre abajo */
+.book-card .mt-auto,
+.placeholder-card .mt-auto {
+  margin-top: auto;
+}
+
+@media (max-width: 576px) {
+  .card-meta { min-height: 4rem; } /* en móvil quizá quieras más espacio vertical */
+}
+
+/* responsive tweaks */
+@media (max-width: 576px) {
+  .card-image {
+    aspect-ratio: 3 / 4;
+    max-height: 380px;
+  }
+}

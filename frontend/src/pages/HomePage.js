@@ -4,15 +4,19 @@ import { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
 import { Row, Col, Alert, Spinner } from "react-bootstrap" 
 import BookCard from "../components/BookCard"
+import BookList from "../components/BookListt"
+import BookCarousel from "../components/BookCarousel"
 import axios from "axios"
 import { AppContext } from '../context/appContext';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 function HomePage() {
+
   const [books, setBooks] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false) // Nuevo estado para loading
+  const [genresWithBooks, setGenresWithBooks] = useState([])
   const location = useLocation()
 
   // Función para obtener los parámetros de búsqueda desde la URL
@@ -44,6 +48,7 @@ function HomePage() {
         const response = await axios.get(url)
         setBooks(response.data)
         setError(null)
+        console.log(response)
       } catch (err) {
         setError("Error al cargar los libros. Intenta nuevamente más tarde.")
         console.error(err)
@@ -54,34 +59,35 @@ function HomePage() {
     fetchBooks()
   }, [location.search]) // Vuelve a ejecutar cuando cambie la búsqueda en la URL
 
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        const resp = await axios.get(`${API_URL}/genres-with-books?limit=8`);
+        setGenresWithBooks(resp.data);
+      } catch (err) {
+        setError("No se pudo cargar los géneros");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, []);
+
   const searchParams = getSearchParams()
 
   return (
-    <div>
-      <h2 className="mb-4">
-        {searchParams.shelf === "mylibrary" ? "Mi Biblioteca" : "Descubre Libros"}
-      </h2>
 
-      {loading ? (
-        <div className="text-center">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </Spinner>
-          <p>Cargando libros...</p>
-        </div>
-      ) : error ? (
-        <Alert variant="danger">{error}</Alert>
-      ) : books.length === 0 ? (
-        <Alert variant="info">No se encontraron libros que coincidan con tus criterios. Ajusta tu búsqueda o filtros.</Alert>
-      ) : (
-        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {books.map((book) => (
-            <Col key={book.id}>
-              <BookCard book={book} />
-            </Col>
-          ))}
-        </Row>
-      )}
+    <div>
+      <h3 className="mb-3">Descubre Libros</h3>
+      <BookCarousel books={books} />
+      {genresWithBooks.map((genre) => (
+        <section key={genre.id} className="mb-5">
+          <h3 className="mb-3">{genre.name}</h3>
+          <BookCarousel books={genre.books} />
+        </section>
+      ))}
     </div>
   )
 }

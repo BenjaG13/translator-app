@@ -1,0 +1,45 @@
+/* src/styles/components/bookcard.css */
+
+/* Quitar borde predeterminado de la card */
+.book-card {
+  border: none;            /* quita la línea */
+  background-clip: padding-box; /* evita halos en bordes */
+  box-shadow: none;        /* opcional: quita sombra por defecto */
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Si antes usabas shadow-sm, esto garantiza que no aparezca */
+.book-card.shadow-sm {
+  box-shadow: none !important;
+}
+
+/* Hover visual suave (opcional). Si no querés ningún efecto, borrá esta regla */
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Focus: no quitar por completo la ayuda a teclado. 
+   Usá :focus-visible para mantener accesibilidad. */
+.book-card:focus {
+  outline: none;
+}
+.book-card:focus-visible {
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.16); /* anillo sutil azul */
+}
+
+/* Asegura que la imagen no tenga bordes */
+.book-card .card-image,
+.book-card img {
+  border: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Si tu BookCard tuviera border-radius, que la imagen lo respete */
+.book-card {
+  border-radius: .5rem;
+  overflow: hidden;
+}
