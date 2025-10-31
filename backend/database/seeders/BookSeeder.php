@@ -3773,7 +3773,89 @@ EOD,
                 'pages' => 1216,
                 'synopsis' => 'Una épica aventura en la Tierra Media para destruir el Anillo Único.',
                 'cover_image' => 'https://example.com/cover3.jpg'
-            ]
+            ],
+
+            [
+                'title' => 'Cien años de soledad',
+                'author' => 'Gabriel García Márquez',
+                'year' => 1967,
+                'content' => 'Contenido del libro sobre la historia de la familia Buendía en el mítico pueblo de Macondo...',
+                'pages' => 417,
+                'synopsis' => 'La saga multigeneracional de los Buendía: realismo mágico, amores y tragedias en Macondo.',
+                'cover_image' => 'https://example.com/cover4.jpg'
+            ],
+            [
+                'title' => '1984444',
+                'author' => 'George Orwell',
+                'year' => 1949,
+                'content' => 'Contenido del libro sobre un estado totalitario que vigila y reescribe la historia...',
+                'pages' => 328,
+                'synopsis' => 'Un hombre desafía el control absoluto del Gran Hermano en una sociedad distópica.',
+                'cover_image' => 'https://example.com/cover5.jpg'
+            ],
+            [
+                'title' => 'El gran Gatsby',
+                'author' => 'F. Scott Fitzgerald',
+                'year' => 1925,
+                'content' => 'Contenido del libro centrado en la vida de Jay Gatsby y la alta sociedad de los años 20...',
+                'pages' => 180,
+                'synopsis' => 'Una historia de ambición, amor imposible y decadencia durante la era del jazz.',
+                'cover_image' => 'https://example.com/cover6.jpg'
+            ],
+            [
+                'title' => 'Crimen y castigo',
+                'author' => 'Fiódor Dostoievski',
+                'year' => 1866,
+                'content' => 'Contenido del libro que explora la culpa, la redención y la psicología del crimen...',
+                'pages' => 671,
+                'synopsis' => 'El conflicto interior de un joven que comete un asesinato y lucha con su conciencia.',
+                'cover_image' => 'https://example.com/cover7.jpg'
+            ],
+            [
+                'title' => 'Fahrenheit 451',
+                'author' => 'Ray Bradbury',
+                'year' => 1953,
+                'content' => 'Contenido del libro sobre bomberos que queman libros en una sociedad que prohíbe la lectura...',
+                'pages' => 194,
+                'synopsis' => 'Una alegoría sobre la censura, el pensamiento crítico y la pérdida de la cultura escrita.',
+                'cover_image' => 'https://example.com/cover8.jpg'
+            ],
+            [
+                'title' => 'Matar a un ruiseñor',
+                'author' => 'Harper Lee',
+                'year' => 1960,
+                'content' => 'Contenido del libro visto por los ojos de Scout, en un pueblo sureño marcado por la injusticia...',
+                'pages' => 281,
+                'synopsis' => 'La historia de la infancia, la moral y el racismo en el sur de Estados Unidos.',
+                'cover_image' => 'https://example.com/cover9.jpg'
+            ],
+            [
+                'title' => 'La carretera',
+                'author' => 'Cormac McCarthy',
+                'year' => 2006,
+                'content' => 'Contenido del libro que narra el viaje de un padre y su hijo a través de un mundo postapocalíptico...',
+                'pages' => 287,
+                'synopsis' => 'Un bellísimo relato de supervivencia, amor paterno y esperanza en un mundo devastado.',
+                'cover_image' => 'https://example.com/cover10.jpg'
+            ],
+            [
+                'title' => 'El nombre del viento',
+                'author' => 'Patrick Rothfuss',
+                'year' => 2007,
+                'content' => 'Contenido del libro que sigue la vida de Kvothe, su aprendizaje y sus aventuras mágicas...',
+                'pages' => 662,
+                'synopsis' => 'La primera parte de una saga fantástica sobre un músico, mago y aventurero legendario.',
+                'cover_image' => 'https://example.com/cover11.jpg'
+            ],
+            [
+                'title' => 'La chica del tren',
+                'author' => 'Paula Hawkins',
+                'year' => 2015,
+                'content' => 'Contenido del libro sobre una mujer que observa desde el tren y se ve envuelta en un misterio...',
+                'pages' => 336,
+                'synopsis' => 'Thriller psicológico sobre recuerdos, mentiras y un crimen que desvela secretos cotidianos.',
+                'cover_image' => 'https://pdlibrosarg.cdnstatics2.com/usuaris/libros/thumbs/b0efc0e7-69fe-4425-947f-14fef682f660/d_1200_1200/portada_la-chica-del-tren_paula-hawkins_201611281622.webp'
+            ],
         ];
 
         foreach ($books as $book) {
