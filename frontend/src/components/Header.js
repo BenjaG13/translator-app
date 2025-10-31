@@ -38,11 +38,11 @@ function Header() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    navigate(`/?search=${searchTerm}`);
+    navigate(`results/?search=${searchTerm}`);
   };
 
   const handleGenreSelect = (genre) => {
-    navigate(`/?genre=${genre}`);
+    navigate(`results/?genre=${genre}`);
   };
 
   // Handle Register
@@ -104,7 +104,7 @@ function Header() {
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          BookReaderrr
+          BookReader
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

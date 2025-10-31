@@ -7,6 +7,7 @@ import BookReaderPage from "./pages/BookReaderPage"
 import MyLibraryPage from "./pages/MyLibraryPage";
 import Footer from "./components/Footer"
 import { AppProvider } from "./context/appContext";
+import SearchBookPage from "./pages/SearchBookPage"
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/mylibrary" element={<MyLibraryPage />} />
+                <Route path="/results" element={<SearchBookPage />} />
                 <Route path="/:slug" element={<BookDetailPage />} />
                 <Route path="/:slug/read" element={<BookReaderPage />} />
               </Routes>
