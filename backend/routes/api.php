@@ -31,6 +31,8 @@ Route::get('genres', [GenreController::class, 'index']);
 
 Route::get('/books/{slug}/sentences', [BookController::class, 'getSentences']);
 
+Route::get('/genres-with-books', [GenreController::class, 'indexWithBooks']);
+
 
 Route::post('login', [UserController::class, 'login']);
 Route::post('register', [UserController::class, 'register']);

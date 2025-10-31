@@ -9,7 +9,6 @@ class TranslationController extends Controller
 {
     public function translate(Request $request)
     {
-        response()->json(['error' => 'llegueeee'], 500);
         
         $request->validate([
             'text' => 'required|string',
@@ -44,4 +43,3 @@ class TranslationController extends Controller
 }
 
 
-// return response()->json(['error' => 'Error en la ssasa'], 500);

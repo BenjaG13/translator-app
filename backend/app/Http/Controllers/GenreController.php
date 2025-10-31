@@ -6,6 +6,8 @@ use App\Http\Requests\StoreGenreRequest;
 use App\Http\Requests\UpdateGenreRequest;
 use App\Models\Genre;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class GenreController extends Controller
 {
@@ -68,5 +70,22 @@ class GenreController extends Controller
     public function destroy(Genre $genre)
     {
         //
+    }
+
+     public function indexWithBooks(Request $request): JsonResponse
+    {
+        $limitPerGenre = (int) $request->query('limit', 12); // default 12
+
+        //cache por x segundos para rendimiento
+        $cacheKey = "genres_with_books_{$limitPerGenre}";
+        $data = Cache::remember($cacheKey, 60, function () use ($limitPerGenre) {
+            return Genre::query()
+                ->with(['books' => function ($q) use ($limitPerGenre) {
+                    $q->with('genres')->take($limitPerGenre);
+                }])
+                ->get();
+        });
+
+        return response()->json($data, 200);
     }
 }
