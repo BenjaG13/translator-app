@@ -1,59 +1,106 @@
+# version: '3.8'
+
+# services:
+
+#   laravel:
+#     build:
+#       context: backend
+#       dockerfile: Dockerfile
+#       target: production
+#     env_file:
+#       - .env
+#     volumes:
+#       - .env:/var/www/.env:ro
+#     ports:
+#       - "9000:9000" 
+#     restarts:
+#       - unless-stopped
+  
+
+#   frontend:
+#     build:
+#       context: frontend
+#       dockerfile: Dockerfile
+#       target: production
+#     depends_on:
+#       - laravel
+#     restarts:
+#       - unless-stopped
+
+#   caddy:
+#     build:
+#       context: caddy
+#       dockerfile: Dockerfile
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - caddy_data:/data
+#       - caddy_config:/config
+#     depends_on:
+#       - frontend
+#       - laravel
+#     restarts:
+#       - unless-stopped
+
+#   libretranslate:
+#     image: libretranslate/libretranslate
+#     ports:
+#       - "5000:5000"
+#     command: --load-only=en,es
+#     restarts:
+#       - unless-stopped
+
+
+# volumes:  
+#   caddy_data:
+#   caddy_config:
+
 version: '3.8'
 
 services:
 
   laravel:
-    build:
-      context: backend
-      dockerfile: Dockerfile
-      target: production
-    env_file:
-      - .env
+    image: ${GHCR_REGISTRY:-ghcr.io}/${OWNER}/translator-app-backend:${BACKEND_TAG:-latest}
     volumes:
-      - .env:/var/www/.env:ro
-    ports:
-      - "9000:9000" 
-    restarts:
-      - unless-stopped
-  
+      - ./secrets/backend/.env:/var/www/.env:ro
+      - laravel_storage:/var/www/storage
+    restart: unless-stopped
+    networks:
+      - web
 
   frontend:
-    build:
-      context: frontend
-      dockerfile: Dockerfile
-      target: production
-    depends_on:
-      - laravel
-    restarts:
-      - unless-stopped
+    image: ${GHCR_REGISTRY:-ghcr.io}/${OWNER}/translator-app-frontend:${FRONTEND_TAG:-latest}
+    restart: unless-stopped
+    networks:
+      - web
 
   caddy:
-    build:
-      context: caddy
-      dockerfile: Dockerfile
+    image: ${GHCR_REGISTRY:-ghcr.io}/${OWNER}/translator-app-caddy:${CADDY_TAG:-latest}
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
-    depends_on:
-      - frontend
-      - laravel
-    restarts:
-      - unless-stopped
+    restart: unless-stopped
+    networks:
+      - web
 
   libretranslate:
     image: libretranslate/libretranslate
     ports:
-      - "5000:5000"
+      - "5000:5000"   # opcional: exponelo solo si lo necesitas externamente
     command: --load-only=en,es
-    restarts:
-      - unless-stopped
+    restart: unless-stopped
+    networks:
+      - web
 
-
-volumes:  
+volumes:
   caddy_data:
   caddy_config:
+  laravel_storage:
 
- 
+networks:
+  web:
+    driver: bridge

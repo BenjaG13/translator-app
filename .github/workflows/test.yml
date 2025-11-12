@@ -15,6 +15,6 @@ jobs:
           echo "meta tags = ${{ steps.meta-backend.outputs.tags }}"
       - name: show caddy
         run: |
-          echo "tags =$ {{ steps.meta-caddy.outputs.labels }}"
+          echo "tags = ${{ steps.meta-caddy.outputs.labels }}"
 
         
