@@ -1,38 +1,75 @@
-:80 {
-    # gzip responses
+
+# caddy/Caddyfile.prod
+translatorbooks.ddns.net {
+    # ACME email (pon tu mail real)
+    tls benjaguillenea@gmail.com
+
+    # Compresión
     encode gzip
 
-    # Access log to stdout (JSON) -> Render mostrará esto en Live Logs
+    # Logs en stdout (JSON) - útil si usás docker logs o un collector
     log {
         output stdout
         format json
     }
 
+    # Security headers globales
+    #header {
+    #    # HSTS: activar sólo si HTTPS está funcionando correctamente en producción
+    #    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    #    X-Frame-Options "DENY"
+    #    X-Content-Type-Options "nosniff"
+    #    Referrer-Policy "no-referrer-when-downgrade"
+    #    Permissions-Policy "geolocation=(), microphone=()"
+    #    X-XSS-Protection "1; mode=block"
+    #}
 
+    # Evitar uploads masivos abusivos
+    request_body {
+        max_size 10MB
+    }
 
-    # API -> backend público de Render (forzamos Host al upstream correcto)
-    @api path /api/*
+    # Healthcheck (útil para orquestadores / monitoring)
+    @health path /healthz
+    handle @health {
+        respond "ok" 200
+    }
+
+    # Bloquear user-agents básicos (reduce robots ruidosos)
+    @bad_ua header_regexp BadUA User-Agent "(?i)^(?:$|curl|wget|python-requests|libwww-perl|java|perl|nikto|dirb|acunetix)"
+    respond @bad_ua 403 {
+        body "Forbidden"
+    }
+
+    # Bloquear requests con path sospechoso (ejemplo)
+    @suspicious path_regexp Suspicious ^/(phpmyadmin|wp-admin|\.env|shell)
+    respond @suspicious 403
+
+    # API -> proxy interno al servicio laravel (ajusta puerto si fuera distinto)
+    @api path /api/* /api
     handle @api {
-        reverse_proxy https://translator-backend-laca.onrender.com {
-            transport http {
-                tls
-            }
-            # Enviamos Host del upstream (evita que Caddy intente resolver el dominio hacia sí mismo)
-            header_up Host translator-backend-laca.onrender.com
+        reverse_proxy laravel:80 {
+            header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
+            transport http {
+                # timeouts defensivos
+                read_timeout 60s
+                dial_timeout 10s
+            }
         }
     }
 
-    # Resto -> frontend público de Render
+    # Resto -> frontend (servicio que sirve los assets o app)
     handle {
-        reverse_proxy https://translator-frontend-8b1v.onrender.com {
-            transport http { 
-                tls 
-            }
-            header_up Host translator-frontend-8b1v.onrender.com
+        reverse_proxy frontend:80 {
+            header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote_host}
+            transport http {
+                read_timeout 60s
+                dial_timeout 10s
+            }
         }
     }
 }

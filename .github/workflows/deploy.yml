@@ -1,0 +1,44 @@
+name: Deploy to VPS (pull images from GHCR)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for logs/context)
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            echo "Login to GHCR on VPS (so docker pull works)..."
+            echo "${{ secrets.GHCR_DEPLOY_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_DEPLOY_USER }}" --password-stdin
+
+            cd /srv/translator-app
+
+            echo "Pulling images..."
+            docker compose pull
+
+            # Optional cleanup
+            docker image prune -af || true
+
+            echo "Starting services..."
+            docker compose up -d --remove-orphans
+
+            echo "Status (last 50 log lines):"
+            docker compose ps
+            docker compose logs --tail=50

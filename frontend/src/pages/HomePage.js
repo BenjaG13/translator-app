@@ -63,6 +63,7 @@ function HomePage() {
     const fetch = async () => {
       setLoading(true);
       try {
+        console.log(API_URL)
         const resp = await axios.get(`${API_URL}/genres-with-books?limit=8`);
         setGenresWithBooks(resp.data);
       } catch (err) {

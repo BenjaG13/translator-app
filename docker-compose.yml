@@ -11,6 +11,7 @@ services:
       - .env.dev
     volumes:
       - ./backend:/var/www
+      - .env.dev:/var/www/.env:ro
     ports:
       - "9000:9000" 
     # depends_on:

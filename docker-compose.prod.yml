@@ -8,9 +8,13 @@ services:
       dockerfile: Dockerfile
       target: production
     env_file:
-      - .env      
+      - .env
+    volumes:
+      - .env:/var/www/.env:ro
     ports:
       - "9000:9000" 
+    restarts:
+      - unless-stopped
   
 
   frontend:
@@ -20,6 +24,8 @@ services:
       target: production
     depends_on:
       - laravel
+    restarts:
+      - unless-stopped
 
   caddy:
     build:
@@ -27,16 +33,27 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       - frontend
       - laravel
-
+    restarts:
+      - unless-stopped
 
   libretranslate:
     image: libretranslate/libretranslate
     ports:
       - "5000:5000"
     command: --load-only=en,es
+    restarts:
+      - unless-stopped
 
+
+volumes:  
+  caddy_data:
+  caddy_config:
 
  
