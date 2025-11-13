@@ -1,5 +1,5 @@
 # Etapa base: Configuración común
-FROM node:alpine AS base
+FROM node:20-alpine AS base
 
 WORKDIR /app
 
