@@ -38,7 +38,9 @@ jobs:
             docker image prune -af || true
 
             echo "Starting services..."
-            docker compose up -d --remove-orphans
+            docker compose -f docker-compose.prod.yml up -d --remove-
+
+            # docker compose up -d --remove-orphans
 
             echo "Status (last 50 log lines):"
             docker compose ps
