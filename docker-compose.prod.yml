@@ -63,7 +63,7 @@ services:
   laravel:
     image: ${GHCR_REGISTRY:-ghcr.io}/${OWNER}/translator-app-backend:${BACKEND_TAG:-latest}
     volumes:
-      - ./secrets/backend/.env:/var/www/.env:ro
+      - ./backend/.env.prouction:/var/www/.env:ro
       - laravel_storage:/var/www/storage
     restart: unless-stopped
     networks:
