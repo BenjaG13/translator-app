@@ -1,5 +1,5 @@
 # Etapa base: Configuración común
-FROM node:20-alpine AS base
+FROM node:alpine AS base
 
 WORKDIR /app
 
@@ -50,8 +50,10 @@ FROM base AS builder
 # Instala solo las dependencias de producción
 RUN npm install --production
 
+
 # Copia el resto del código y construye los assets estáticos
 COPY . .
+ENV NODE_OPTIONS="--no-webstorage"
 RUN npm run build 
 
 # Etapa de producción
