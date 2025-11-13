@@ -32,7 +32,7 @@ jobs:
             cd /srv/translator-app
 
             echo "Pulling images..."
-            docker compose pull
+            docker compose -f docker-compose.prod.yml pull
 
             # Optional cleanup
             docker image prune -af || true
@@ -43,5 +43,5 @@ jobs:
             # docker compose up -d --remove-orphans
 
             echo "Status (last 50 log lines):"
-            docker compose ps
-            docker compose logs --tail=50
+            docker compose -f docker-compose.prod.yml ps
+            docker compose -f docker-compose.prod.yml logs --tail=50
