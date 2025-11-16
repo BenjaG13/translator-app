@@ -11,7 +11,7 @@ return new class extends Migration
      * 
      */
 
-    public $withinTransaction = false;
+    public $withinTransaction = true;
 
     public function up(): void
     {
