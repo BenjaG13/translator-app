@@ -29,6 +29,7 @@ services:
       - "3000:3000"  # Opcional, para acceso directo al servidor de desarrollo
     environment:
       - CHOKIDAR_USEPOLLING=true  # Mejora la detección de cambios en volúmenes
+      - NODE_OPTIONS=--no-experimental-webstorage
     depends_on:
       - laravel
 
