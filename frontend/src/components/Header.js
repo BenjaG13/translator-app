@@ -141,7 +141,7 @@ function Header() {
               onChange={handleSearchChange}
             />
           </Form>
-          {/* {!state.token && ( */}
+          {!state.token && (
             <>
               <Button variant="outline-primary" className="ms-2" onClick={() => setShowRegister(true)} disabled={isLoading}>
                 Registrarse
@@ -150,10 +150,10 @@ function Header() {
                 Login
               </Button>
             </>
-          {/* )}  */}
+          )}  
           {state.token && (
             <Button variant="outline-danger" className="ms-2" onClick={handleLogout} disabled={isLoading}>
-              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : `Lgout ${state.user}`}
+              {isLoading ? <Spinner as="span" animation="border" size="sm" /> : `Logout ${state.user}`}
             </Button>
           )}
         </Navbar.Collapse>

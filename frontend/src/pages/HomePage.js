@@ -6,6 +6,7 @@ import { Row, Col, Alert, Spinner } from "react-bootstrap"
 import BookCard from "../components/BookCard"
 import BookList from "../components/BookListt"
 import BookCarousel from "../components/BookCarousel"
+import BookPlaceholder from "../components/BookPlaceholder"
 import axios from "axios"
 import { AppContext } from '../context/appContext';
 
@@ -82,7 +83,7 @@ function HomePage() {
 
     <div>
       <h3 className="mb-3">Descubre Libros</h3>
-      <BookCarousel books={books} />
+      <BookCarousel books={books} loading={loading} placeholderCount={6} />
       {genresWithBooks.map((genre) => (
         <section key={genre.id} className="mb-5">
           <h3 className="mb-3">{genre.name}</h3>

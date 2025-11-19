@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Row, Col, Alert, Spinner } from "react-bootstrap";
 import BookCard from "../components/BookCard";
 import BookCarousel from "../components/BookCarousel";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { AppContext } from "../context/appContext";
 import axios from "axios";
 
@@ -39,9 +40,7 @@ function MyLibraryPage() {
       <h2 className="mb-4">Mi Biblioteca</h2>
       {loading ? (
         <div className="text-center">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </Spinner>
+          <LoadingSpinner className="text-center py-5" />
           <p>Cargando libros...</p>
         </div>
       ) : error ? (

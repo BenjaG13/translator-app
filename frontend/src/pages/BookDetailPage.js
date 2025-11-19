@@ -76,7 +76,12 @@ function BookDetailPage() {
   if (loading) {
     // return <div className="text-center py-5">Cargando...</div>;
     // return <LoadingSpinner className="text-center py-5" />;
-    return <LoadingSpinner className="text-center py-5" />;
+    return (
+      <div className="text-center">
+        <LoadingSpinner className="text-center py-5" />
+        <p>Cargando detalle...</p>
+      </div>
+    )
   }
 
   if (error) {
@@ -129,9 +134,9 @@ function BookDetailPage() {
             <Button variant="success" size="lg" onClick={handleReadNow}>
               Leer Ahora
             </Button>
-            <Button variant="outline-secondary" size="lg">
+            {/* <Button variant="outline-secondary" size="lg">
               Añadir a la Biblioteca
-            </Button>
+            </Button> */}
           </div>
         </Col>
       </Row>
